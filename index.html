@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pro Shop</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    text-align: center;
+}
+
+.container {
+    width: 300px;
+    margin: auto;
+    margin-top: 80px;
+    background: rgba(0,0,0,0.5);
+    padding: 20px;
+    border-radius: 15px;
+    animation: fadeIn 1s;
+}
+
+input, button {
+    width: 90%;
+    padding: 10px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+}
+
+button {
+    background: #00c9a7;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #00a087;
+}
+
+.hidden {
+    display: none;
+}
+
+.product {
+    background: white;
+    color: black;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+@keyframes fadeIn {
+    from {opacity:0; transform: translateY(20px);}
+    to {opacity:1;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="container" id="loginBox">
+<h2>Login</h2>
+<input type="text" id="loginUser" placeholder="Username">
+<input type="password" id="loginPass" placeholder="Password">
+<button onclick="login()">Login</button>
+<p onclick="showRegister()">Create Account</p>
+</div>
+
+<!-- REGISTER -->
+<div class="container hidden" id="registerBox">
+<h2>Register</h2>
+<input type="text" id="regUser" placeholder="Username">
+<input type="password" id="regPass" placeholder="Password">
+<button onclick="register()">Register</button>
+<p onclick="showLogin()">Back to Login</p>
+</div>
+
+<!-- SHOP -->
+<div class="container hidden" id="shopBox">
+<h2>Welcome <span id="userName"></span></h2>
+
+<div class="product">
+<h3>Product 1</h3>
+<button onclick="order('Product 1')">Order</button>
+</div>
+
+<div class="product">
+<h3>Product 2</h3>
+<button onclick="order('Product 2')">Order</button>
+</div>
+
+<button onclick="logout()">Logout</button>
+</div>
+
+<!-- ADMIN -->
+<div class="container hidden" id="adminBox">
+<h2>Admin Panel</h2>
+<button onclick="viewOrders()">View Orders</button>
+<div id="orders"></div>
+</div>
+
+<script>
+
+// Register
+function register() {
+    let user = regUser.value;
+    let pass = regPass.value;
+
+    localStorage.setItem(user, pass);
+    alert("Registered সফল!");
+    showLogin();
+}
+
+// Login
+function login() {
+    let user = loginUser.value;
+    let pass = loginPass.value;
+
+    let savedPass = localStorage.getItem(user);
+
+    if (user === "admin" && pass === "admin123") {
+        loginBox.classList.add("hidden");
+        adminBox.classList.remove("hidden");
+    }
+    else if (savedPass === pass) {
+        localStorage.setItem("currentUser", user);
+        loginBox.classList.add("hidden");
+        shopBox.classList.remove("hidden");
+        userName.innerText = user;
+    } else {
+        alert("ভুল তথ্য!");
+    }
+}
+
+// Order
+function order(product) {
+    let user = localStorage.getItem("currentUser");
+
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.push(user + " ordered " + product);
+
+    localStorage.setItem("orders", JSON.stringify(orders));
+    alert("Order সফল!");
+}
+
+// View Orders (Admin)
+function viewOrders() {
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    ordersDiv = document.getElementById("orders");
+
+    ordersDiv.innerHTML = "";
+
+    orders.forEach(o => {
+        ordersDiv.innerHTML += "<p>" + o + "</p>";
+    });
+}
+
+// UI Switch
+function showRegister() {
+    loginBox.classList.add("hidden");
+    registerBox.classList.remove("hidden");
+}
+
+function showLogin() {
+    registerBox.classList.add("hidden");
+    loginBox.classList.remove("hidden");
+}
+
+function logout() {
+    location.reload();
+}
+
+</script>
+
+</body>
+</html>
